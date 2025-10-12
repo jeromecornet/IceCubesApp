@@ -74,6 +74,8 @@ import SwiftUI
     
     @AppStorage("stream_home_timeline") public var streamHomeTimeline: Bool = false
 
+    @AppStorage("load_oldest_first") public var loadOldestFirst: Bool = false
+      
     // Notifications
     @AppStorage("notifications-truncate-status-content")
     public var notificationsTruncateStatusContent: Bool = true
@@ -369,6 +371,13 @@ import SwiftUI
     }
   }
 
+  public var loadOldestFirst: Bool {
+    didSet {
+      storage.loadOldestFirst = loadOldestFirst
+    }
+  }
+
+    
   // Notifications
   public var notificationsTruncateStatusContent: Bool {
     didSet {
@@ -554,6 +563,7 @@ import SwiftUI
     isSidebarExpanded = storage.isSidebarExpanded
     notificationsTruncateStatusContent = storage.notificationsTruncateStatusContent
     streamHomeTimeline = storage.streamHomeTimeline
+    loadOldestFirst = storage.loadOldestFirst
   }
 }
 

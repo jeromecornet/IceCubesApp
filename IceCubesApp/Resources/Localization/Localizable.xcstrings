@@ -35557,6 +35557,28 @@
         }
       }
     },
+    "Load oldest post first" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Load oldest post first"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Load oldest posts first"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Charger les toot plus anciens d’abord"
+          }
+        }
+      }
+    },
     "Local Timeline" : {
       "localizations" : {
         "de" : {

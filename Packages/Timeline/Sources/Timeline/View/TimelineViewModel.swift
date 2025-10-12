@@ -392,16 +392,30 @@ extension TimelineViewModel: GapLoadingFetcher {
     // Update UI to show loading state without causing jumps
     await updateStatusesState()
 
+    let preferences = UserPreferences.shared
+      
     do {
       // Fetch statuses within the gap
-      let statuses: [Status] = try await client.get(
-        endpoint: timeline.endpoint(
-          sinceId: gap.sinceId.isEmpty ? nil : gap.sinceId,
-          maxId: gap.maxId,
-          minId: nil,
-          offset: 0,
-          limit: 50))
-
+        var statuses: [Status];
+        var sinceId = gap.sinceId.isEmpty ? nil : gap.sinceId
+        if (preferences.loadOldestFirst) {
+            statuses = try await client.get(
+                endpoint: timeline.endpoint(
+                    sinceId: sinceId,
+                    maxId: gap.maxId,
+                    minId: nil,
+                    offset: 0,
+                    limit: 50))
+        }
+        else {
+            statuses = try await client.get(
+                endpoint: timeline.endpoint(
+                    sinceId: nil,
+                    maxId: gap.maxId,
+                    minId: sinceId,
+                    offset: 0,
+                    limit: 50))
+        }
       StatusDataControllerProvider.shared.updateDataControllers(for: statuses, client: client)
 
       // Get the original gap index before replacing
@@ -422,8 +436,11 @@ extension TimelineViewModel: GapLoadingFetcher {
         let originalGapIndex = gapIndex
       {
         // Create a new gap from the original gap's sinceId to the oldest status we just loaded
+          if (!preferences.loadOldestFirst) {
+              sinceId = oldestLoadedStatus.id
+          }
         await createGapForOlderStatuses(
-          sinceId: gap.sinceId.isEmpty ? nil : gap.sinceId,
+          sinceId: sinceId,
           maxId: oldestLoadedStatus.id,
           at: originalGapIndex + statuses.count
         )

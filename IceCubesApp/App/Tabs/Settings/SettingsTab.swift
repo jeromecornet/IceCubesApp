@@ -235,6 +235,9 @@ struct SettingsTabs: View {
         Label("Stream home timeline", systemImage: "antenna.radiowaves.left.and.right")
           .symbolVariant(preferences.streamHomeTimeline ? .none : .slash)
       }
+      Toggle(isOn: $preferences.loadOldestFirst) {          
+        Label("Load oldest post first", systemImage: preferences.loadOldestFirst ? "square.and.arrow.up.badge.clock.fill" : "square.and.arrow.down.badge.clock.fill")
+      }
     } header: {
       Text("settings.section.other")
     } footer: {
