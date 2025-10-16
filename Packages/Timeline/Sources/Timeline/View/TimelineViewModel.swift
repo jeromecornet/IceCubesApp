@@ -427,6 +427,8 @@ extension TimelineViewModel: GapLoadingFetcher {
         return false
       })
 
+      var scrollId = gap.id
+        
       // Replace the gap with the fetched statuses
       await datasource.replaceGap(id: gap.id, with: statuses)
 
@@ -436,18 +438,28 @@ extension TimelineViewModel: GapLoadingFetcher {
         let originalGapIndex = gapIndex
       {
         // Create a new gap from the original gap's sinceId to the oldest status we just loaded
-          if (!preferences.loadOldestFirst) {
-              sinceId = oldestLoadedStatus.id
-          }
-        await createGapForOlderStatuses(
+        if (!preferences.loadOldestFirst) {
+          sinceId = oldestLoadedStatus.id
+        }
+        let newGap = await createGapForOlderStatuses(
           sinceId: sinceId,
           maxId: oldestLoadedStatus.id,
           at: originalGapIndex + statuses.count
         )
+        scrollId = newGap.id
+          
       }
-
+      else {
+        scrollId = gap.sinceId
+      }
+      
       // Update the display
       await updateStatusesStateWithAnimation()
+
+      if (preferences.loadOldestFirst) {
+        scrollToId = scrollId
+      }
+                  
     } catch {
       // If loading fails, reset the gap loading state
       await datasource.updateGapLoadingState(id: gap.id, isLoading: false)
@@ -486,10 +498,11 @@ extension TimelineViewModel: GapLoadingFetcher {
     }
   }
 
-  private func createGapForOlderStatuses(sinceId: String? = nil, maxId: String, at index: Int) async
+    private func createGapForOlderStatuses(sinceId: String? = nil, maxId: String, at index: Int) async -> TimelineGap
   {
     let gap = TimelineGap(sinceId: sinceId, maxId: maxId)
     await datasource.insertGap(gap, at: index)
+    return gap
   }
 }
 
